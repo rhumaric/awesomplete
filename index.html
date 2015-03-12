@@ -364,6 +364,45 @@ awesomplete.list = ["Ada", "Java", "JavaScript", "Brainfuck", "LOLCODE", "Node.j
 	}	
 });</script></code></pre>
 	</section>
+
+	<section id="async-filtering">
+	<h2>Asynchronous filteering</h2>
+	<label>
+		Choose a programming language: <input class="js-awesompleteAsync" />
+	</label>
+	<pre class="language-markup">
+	<code>&lt;input class="js-awesompleteAsync" /&gt;</code>
+  </pre>
+  <pre class="language-javascript"><code><script>
+  (function (Awesomplete) {
+
+  	// We'll simulate a backend server with a simple list and setTimeout
+  	var languageList = [
+		  "Ada", 
+		  "Java", 
+		  "JavaScript", 
+		  "Brainfuck", 
+		  "LOLCODE", 
+		  "Node.js", 
+		  "Ruby on Rails"
+		];
+
+  	function serverFiltering(value, callback) {
+  		setTimeout(function () {
+  			var results = languageList.filter(function (language) {
+  				return language.toLowerCase().indexOf(value.toLowerCase()) !== -1;
+  			});
+
+  			callback(results, value);
+  		}, 500);
+  	}
+
+  	new Awesomplete('.js-awesompleteAsync', {
+  		getSuggestions: serverFiltering
+  	});
+  })(Awesomplete);
+  </script></code></pre>
+	</section>
 </section>
 
 <section id="download">
