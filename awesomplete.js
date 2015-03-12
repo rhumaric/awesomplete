@@ -31,6 +31,19 @@ var _ = function (input, o) {
 		},
 		replace: function (text) {
 			this.input.value = text;
+		},
+		getSuggestions: function (value, callback) {
+			var me = this;
+
+			var results = this._list
+			           			.filter(function (item) {
+			           				return me.filter(item, value)
+			           			})
+			           			.sort(this.sort);
+
+			if (callback) {    			
+				callback(results, value);
+			}
 		}
 	}, o);
 
@@ -210,32 +223,29 @@ _.prototype = {
 	},
 
 	evaluate: function() {
-		var me = this;
 		var value = this.input.value;
 
-		if (value.length >= this.minChars && this._list.length > 0) {
-			this.index = -1;
-			// Populate list with options that match
-			this.ul.innerHTML = "";
-
-			this._list
-				.filter(function(item) {
-					return me.filter(item, value);
-				})
-				.sort(this.sort)
-				.every(function(text, i) {
-					me.ul.appendChild(me.item(text, value));
-
-					return i < me.maxItems - 1;
-				});
-
-			if (this.ul.children.length === 0) {
-				this.close();
-			} else {
-				this.open();
-			}
+		if (value.length >= this.minChars) {
+			this.getSuggestions(value, this.renderSuggestions.bind(this));
 		}
 		else {
+			this.close();
+		}
+	},
+
+	renderSuggestions: function (suggestions, value) {
+		var me = this;
+		this.index = -1;
+		this.ul.innerHTML = "";
+		suggestions.every((function(text, i) {
+			me.ul.appendChild(me.item(text, value));
+
+			return i < me.maxItems - 1;
+		}));
+
+		if (suggestions && suggestions.length) {
+			this.open();
+		} else {
 			this.close();
 		}
 	}
